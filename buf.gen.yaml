@@ -1,12 +1,12 @@
 version: v1
-managed:
+managed: # managed mode を使用
   enabled: true
   go_package_prefix:
-    default: demo/gen
+    default: demo/gen/
 plugins:
-  - name: go
+  - name: go # protoc-gen-go
     out: gen
     opt: paths=source_relative
-  - name: connect-go
+  - name: connect-go # protoc-gen-connect-go
     out: gen
     opt: paths=source_relative

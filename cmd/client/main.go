@@ -14,7 +14,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	client := greetv1connect.NewGreetServiceClient(http.DefaultClient, "http://localhost:8080", connect.WithGRPCWeb())
+	client := greetv1connect.NewGreetServiceClient(http.DefaultClient, "http://localhost:8080", connect.WithGRPC())
 	res, err := client.Greet(ctx, connect.NewRequest(&greetv1.GreetRequest{Name: "Jane"}))
 	if err != nil {
 		log.Println(err)

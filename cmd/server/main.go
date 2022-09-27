@@ -21,7 +21,7 @@ func (s *GreetServer) Greet(ctx context.Context, req *connect.Request[greetv1.Gr
 	log.Println("Request headers: ", req.Header())
 
 	if req.Msg.Name == "" {
-		// ステータスコードの追加
+		// エラーにステータスコードを追加
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("name is required."))
 	}
 
@@ -29,11 +29,13 @@ func (s *GreetServer) Greet(ctx context.Context, req *connect.Request[greetv1.Gr
 		Greeting: fmt.Sprintf("Hello, %s!", req.Msg.Name),
 	}
 	resp := connect.NewResponse(greetResp)
+	// ヘッダをセットしてみたり
 	resp.Header().Set("Greet-Version", "v1")
 	return resp, nil
 }
 
-func newServerMuxWithReflection() *http.ServeMux {
+// リフレクション設定
+func newServeMuxWithReflection() *http.ServeMux {
 	mux := http.NewServeMux()
 	reflector := grpcreflect.NewStaticReflector(
 		"greet.v1.GreetService", // 作成したサービスを指定
@@ -43,10 +45,11 @@ func newServerMuxWithReflection() *http.ServeMux {
 	return mux
 }
 
+// インターセプタ設定
 func newInterCeptors() connect.Option {
 	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
 		return connect.UnaryFunc(func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			// いろいろな処理
+			// ここでヘッダをセットするなど色々処理を書ける
 			req.Header().Set("hoge", "fuga")
 			return next(ctx, req)
 		})
@@ -57,7 +60,7 @@ func newInterCeptors() connect.Option {
 func main() {
 	greetServer := &GreetServer{}
 
-	mux := newServerMuxWithReflection()
+	mux := newServeMuxWithReflection()
 	interceptor := newInterCeptors()
 	path, handler := greetv1connect.NewGreetServiceHandler(greetServer, interceptor)
 	mux.Handle(path, handler)

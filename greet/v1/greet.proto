@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package greet.v1;
 
+// ※ bufの managed mode を使用するためgo_packageを記述していません
+
 message GreetRequest {
   string name = 1;
 }
